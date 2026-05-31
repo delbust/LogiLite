@@ -170,10 +170,8 @@ clean_signing_metadata() {
   local app_path="$ROOT_DIR/dist/LogiLite.app"
   [[ -d "$app_path" ]] || return 0
   if command -v xattr >/dev/null 2>&1; then
-    find "$app_path" -xattrname com.apple.FinderInfo \
-      -exec xattr -d com.apple.FinderInfo {} \; 2>/dev/null || true
-    find "$app_path" -xattrname "com.apple.fileprovider.fpfs#P" \
-      -exec xattr -d "com.apple.fileprovider.fpfs#P" {} \; 2>/dev/null || true
+    xattr -dr com.apple.FinderInfo "$app_path" 2>/dev/null || true
+    xattr -dr "com.apple.fileprovider.fpfs#P" "$app_path" 2>/dev/null || true
   fi
 }
 
