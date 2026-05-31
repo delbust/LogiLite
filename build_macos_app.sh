@@ -160,9 +160,27 @@ clean_bundle_metadata() {
   fi
 }
 
+remove_qml_build_artifacts() {
+  local app_path="$ROOT_DIR/dist/LogiLite.app"
+  [[ -d "$app_path" ]] || return 0
+  find "$app_path" -name objects-RelWithDebInfo -prune -exec rm -rf {} + 2>/dev/null || true
+}
+
+clean_signing_metadata() {
+  local app_path="$ROOT_DIR/dist/LogiLite.app"
+  [[ -d "$app_path" ]] || return 0
+  if command -v xattr >/dev/null 2>&1; then
+    find "$app_path" -xattrname com.apple.FinderInfo \
+      -exec xattr -d com.apple.FinderInfo {} \; 2>/dev/null || true
+    find "$app_path" -xattrname "com.apple.fileprovider.fpfs#P" \
+      -exec xattr -d "com.apple.fileprovider.fpfs#P" {} \; 2>/dev/null || true
+  fi
+}
+
 sign_ad_hoc() {
   echo "Signing mode: ad-hoc"
   codesign --force --deep --sign - "$ROOT_DIR/dist/LogiLite.app"
+  clean_signing_metadata
   verify_bundle
 }
 
@@ -199,6 +217,7 @@ sign_with_identity() {
     --entitlements "$ENTITLEMENTS" \
     --sign "$SIGN_IDENTITY" \
     "$ROOT_DIR/dist/LogiLite.app"
+  clean_signing_metadata
   verify_bundle
 }
 
@@ -219,6 +238,7 @@ resolve_python
 require_pyinstaller
 log_python_provenance
 run_pyinstaller
+remove_qml_build_artifacts
 clean_bundle_metadata
 sign_app
 
