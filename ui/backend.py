@@ -36,6 +36,7 @@ from core.logi_devices import (
     clamp_dpi,
     get_buttons_for_layout,
 )
+from core.logi_keyboards import get_logitech_keyboards
 from core.key_simulator import (
     ACTIONS,
     custom_action_label,
@@ -188,7 +189,7 @@ def _open_url(url: str) -> bool:
 
 
 def _update_install_enabled() -> bool:
-    value = os.environ.get("MOUSER_ENABLE_UPDATE_INSTALL", "")
+    value = os.environ.get("LOGILITE_ENABLE_UPDATE_INSTALL", "")
     return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
@@ -213,6 +214,7 @@ class Backend(QObject):
     deviceInfoChanged = Signal()
     deviceLayoutChanged = Signal()
     knownAppsChanged = Signal()
+    keyboardDevicesChanged = Signal()
     updateAvailable = Signal(str, str)
     updateInstallChanged = Signal()
 
@@ -263,6 +265,7 @@ class Backend(QObject):
         self._effective_supported_buttons = None  # set by _apply_device_layout
         self._connected_device_refresh_pending = False
         self._connected_device_refresh_attempts = 0
+        self._keyboard_devices = []
         self._latest_update_url = ""
         self._latest_update_version = ""
         self._update_check_in_progress = False
@@ -350,6 +353,7 @@ class Backend(QObject):
         else:
             self._cfg.setdefault("settings", {})["start_at_login"] = False
         self._sync_connected_device_info()
+        self._refreshKeyboardDevices(silent=True)
         self._configureUpdateChecks()
         self._consumeUpdateResultMarker()
         self._cleanupStaleUpdatePreparation()
@@ -739,6 +743,20 @@ class Backend(QObject):
             })
         return result
 
+    @Property(list, notify=keyboardDevicesChanged)
+    def keyboardDevices(self):
+        return list(self._keyboard_devices)
+
+    @Property(bool, notify=keyboardDevicesChanged)
+    def keyboardConnected(self):
+        return any(bool(device.get("connected", True)) for device in self._keyboard_devices)
+
+    @Property(str, notify=keyboardDevicesChanged)
+    def keyboardSummary(self):
+        if not self._keyboard_devices:
+            return ""
+        return ", ".join(str(device.get("name") or "Logitech keyboard") for device in self._keyboard_devices)
+
     def _catalog_app_id(self, spec):
         entry = app_catalog.resolve_app_spec(spec)
         if not entry:
@@ -806,7 +824,7 @@ class Backend(QObject):
         thread = threading.Thread(
             target=self._runUpdateCheck,
             args=(bool(manual), self._update_state),
-            name="MouserUpdateCheck",
+            name="LogiLiteUpdateCheck",
             daemon=True,
         )
         thread.start()
@@ -856,7 +874,7 @@ class Backend(QObject):
         self._pending_update_plan_path = None
         self.updateInstallChanged.emit()
         self.updateAvailable.emit(self._latest_update_version, self._latest_update_url)
-        self.statusMessage.emit(f"Mouser {self._latest_update_version} is available")
+        self.statusMessage.emit(f"LogiLite {self._latest_update_version} is available")
 
     @Slot(bool, bool, object)
     def _handleUpdateCheckFinished(self, manual, reachable, state_data):
@@ -864,7 +882,7 @@ class Backend(QObject):
         self._persistUpdateCheckState(state_data)
         if manual:
             if reachable:
-                self.statusMessage.emit("Mouser is up to date")
+                self.statusMessage.emit("LogiLite is up to date")
             else:
                 self.statusMessage.emit("Could not check for updates")
 
@@ -1133,7 +1151,7 @@ class Backend(QObject):
         self._setUpdateInstallState("checking")
         thread = threading.Thread(
             target=self._runPrepareLatestUpdate,
-            name="MouserPrepareUpdate",
+            name="LogiLitePrepareUpdate",
             daemon=True,
         )
         thread.start()
@@ -1210,7 +1228,7 @@ class Backend(QObject):
             self.settingsChanged.emit()
             if rollback_error is not None:
                 self.statusMessage.emit(
-                    "Start-at-login state is inconsistent; please restart Mouser to recover."
+                    "Start-at-login state is inconsistent; please restart LogiLite to recover."
                 )
             else:
                 self.statusMessage.emit(f"Failed to save login item setting: {exc}")
@@ -1427,6 +1445,26 @@ class Backend(QObject):
     def refreshKnownAppsSilently(self):
         app_catalog.get_app_catalog(refresh=True)
         self.knownAppsChanged.emit()
+
+    def _refreshKeyboardDevices(self, *, silent=False):
+        try:
+            devices = get_logitech_keyboards()
+        except Exception as exc:
+            print(f"[keyboard] failed to refresh Logitech keyboard inventory: {exc}")
+            devices = []
+        self._keyboard_devices = devices
+        self.keyboardDevicesChanged.emit()
+        if not silent:
+            if devices:
+                self.statusMessage.emit(
+                    "Detected " + ", ".join(str(d.get("name") or "Logitech keyboard") for d in devices)
+                )
+            else:
+                self.statusMessage.emit("No Logitech keyboard detected")
+
+    @Slot()
+    def refreshKeyboardDevices(self):
+        self._refreshKeyboardDevices(silent=False)
 
     @Slot(str)
     def deleteProfile(self, name):

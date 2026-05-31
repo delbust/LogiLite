@@ -1,7 +1,7 @@
-# Mouser — Logitech Mouse Remapper
+# LogiLite — Logitech Mouse Remapper
 
 <p align="center">
-  <img src="images/logo_icon.png" width="128" alt="Mouser logo" />
+  <img src="images/logo_icon.png" width="128" alt="LogiLite logo" />
 </p>
 
 English | [中文文档](README_CN.md)
@@ -37,30 +37,30 @@ Logitech models.
 > **No install required.** Just download, extract, and double-click.
 
 <p align="center">
-  <a href="https://github.com/TomBadash/Mouser/releases/latest">
-    <img src="https://img.shields.io/github/downloads/TomBadash/Mouser/latest/Mouser-Windows.zip?style=for-the-badge&color=00d4aa&logo=windows&label=Windows&displayAssetName=false" alt="Windows Downloads" />
+  <a href="https://github.com/delbust/LogiLite/releases/latest">
+    <img src="https://img.shields.io/github/downloads/delbust/LogiLite/latest/LogiLite-Windows.zip?style=for-the-badge&color=00d4aa&logo=windows&label=Windows&displayAssetName=false" alt="Windows Downloads" />
   </a>
-  <a href="https://github.com/TomBadash/Mouser/releases/latest">
-    <img src="https://img.shields.io/github/downloads/TomBadash/Mouser/latest/Mouser-macOS.zip?style=for-the-badge&color=00d4aa&logo=apple&label=macOS%20Apple%20Silicon&displayAssetName=false" alt="macOS Apple Silicon Downloads" />
+  <a href="https://github.com/delbust/LogiLite/releases/latest">
+    <img src="https://img.shields.io/github/downloads/delbust/LogiLite/latest/LogiLite-macOS.zip?style=for-the-badge&color=00d4aa&logo=apple&label=macOS%20Apple%20Silicon&displayAssetName=false" alt="macOS Apple Silicon Downloads" />
   </a>
-  <a href="https://github.com/TomBadash/Mouser/releases/latest">
-    <img src="https://img.shields.io/github/downloads/TomBadash/Mouser/latest/Mouser-macOS-intel.zip?style=for-the-badge&color=00d4aa&logo=apple&label=macOS%20Intel&displayAssetName=false" alt="macOS Intel Downloads" />
+  <a href="https://github.com/delbust/LogiLite/releases/latest">
+    <img src="https://img.shields.io/github/downloads/delbust/LogiLite/latest/LogiLite-macOS-intel.zip?style=for-the-badge&color=00d4aa&logo=apple&label=macOS%20Intel&displayAssetName=false" alt="macOS Intel Downloads" />
   </a>
-  <a href="https://github.com/TomBadash/Mouser/releases/latest">
-    <img src="https://img.shields.io/github/downloads/TomBadash/Mouser/latest/Mouser-Linux.zip?style=for-the-badge&color=00d4aa&logo=linux&label=Linux&displayAssetName=false" alt="Linux Downloads" />
+  <a href="https://github.com/delbust/LogiLite/releases/latest">
+    <img src="https://img.shields.io/github/downloads/delbust/LogiLite/latest/LogiLite-Linux.zip?style=for-the-badge&color=00d4aa&logo=linux&label=Linux&displayAssetName=false" alt="Linux Downloads" />
   </a>
   <br />
-  <img src="https://img.shields.io/github/downloads/TomBadash/Mouser/total?style=for-the-badge&color=00d4aa&label=Total%20Downloads%20(all%20versions)" alt="Downloads" />
+  <img src="https://img.shields.io/github/downloads/delbust/LogiLite/total?style=for-the-badge&color=00d4aa&label=Total%20Downloads%20(all%20versions)" alt="Downloads" />
 </p>
 
-1. Open the [**latest release page**](https://github.com/TomBadash/Mouser/releases/latest).
+1. Open the [**latest release page**](https://github.com/delbust/LogiLite/releases/latest).
 2. Download the zip for your platform:
-   - **Windows** — `Mouser-Windows.zip`
-   - **macOS (Apple Silicon)** — `Mouser-macOS.zip`
-   - **macOS (Intel)** — `Mouser-macOS-intel.zip`
-   - **Linux** — `Mouser-Linux.zip`
+   - **Windows** — `LogiLite-Windows.zip`
+   - **macOS (Apple Silicon)** — `LogiLite-macOS.zip`
+   - **macOS (Intel)** — `LogiLite-macOS-intel.zip`
+   - **Linux** — `LogiLite-Linux.zip`
 3. Extract it anywhere (Desktop, Documents, `/Applications`, wherever).
-4. Run the executable: `Mouser.exe`, `Mouser.app`, or `./Mouser`.
+4. Run the executable: `LogiLite.exe`, `LogiLite.app`, or `./LogiLite`.
 
 That's it. The app opens, drops a tray / menu-bar icon, and starts remapping immediately.
 
@@ -68,25 +68,25 @@ That's it. The app opens, drops a tray / menu-bar icon, and starts remapping imm
 
 - The settings window opens to the device-aware **Mouse & Profiles** page.
 - A tray icon appears (next to the clock on Windows / Linux, in the menu bar on macOS).
-- Closing the window keeps Mouser running in the tray. Right-click the tray icon → **Quit Mouser** to fully exit.
-- Mouser remembers language and startup behavior between runs.
+- Closing the window keeps LogiLite running in the tray. Right-click the tray icon → **Quit LogiLite** to fully exit.
+- LogiLite remembers language and startup behavior between runs.
 
 ### First-time notes
 
 - **Windows SmartScreen** may warn the first time — click **More info** → **Run anyway**.
-- **Logitech Options+ must not be running.** Both apps fight over HID++ access; quit Options+ before launching Mouser.
+- **Logitech Options+ must not be running.** Both apps fight over HID++ access; quit Options+ before launching LogiLite.
 - **macOS** asks for **Accessibility** permission so the event tap can intercept mouse events. See [readme_mac_osx.md](readme_mac_osx.md) for the full setup walkthrough.
 - **Linux** needs read access to `/dev/hidraw*`, `/dev/input/event*`, and write access to `/dev/uinput`. Run the bundled helper once after extracting:
   ```bash
-  cd /path/to/extracted/Mouser
+  cd /path/to/extracted/LogiLite
   ./install-linux-permissions.sh
   ```
   Reconnect the mouse, then relaunch.
 - Config is saved automatically to:
-  - `%APPDATA%\Mouser\config.json` (Windows)
-  - `~/Library/Application Support/Mouser/config.json` (macOS)
-  - `~/.config/Mouser/config.json` (Linux)
-- Logs rotate automatically (5 × 5 MB) under `%APPDATA%\Mouser\logs`, `~/Library/Logs/Mouser`, or `$XDG_STATE_HOME/Mouser/logs`.
+  - `%APPDATA%\LogiLite\config.json` (Windows)
+  - `~/Library/Application Support/LogiLite/config.json` (macOS)
+  - `~/.config/LogiLite/config.json` (Linux)
+- Logs rotate automatically (5 × 5 MB) under `%APPDATA%\LogiLite\logs`, `~/Library/Logs/LogiLite`, or `$XDG_STATE_HOME/LogiLite/logs`.
 
 ---
 
@@ -94,7 +94,7 @@ That's it. The app opens, drops a tray / menu-bar icon, and starts remapping imm
 
 | Mouse & Profiles | Point & Scroll |
 |---|---|
-| <img src="images/Screenshot_mouse.png" alt="Mouser — Mouse & Profiles page" /> | <img src="images/Screenshot_settings.png" alt="Mouser — Point & Scroll settings" /> |
+| <img src="images/Screenshot_mouse.png" alt="LogiLite — Mouse & Profiles page" /> | <img src="images/Screenshot_settings.png" alt="LogiLite — Point & Scroll settings" /> |
 
 ---
 
@@ -104,7 +104,7 @@ That's it. The app opens, drops a tray / menu-bar icon, and starts remapping imm
 
 - **Remap any programmable button** — middle click, gesture button, back, forward, mode shift, DPI switch (MX Vertical), and horizontal scroll.
 - **Mouse-to-mouse remap** — bind any button to act as left, right, middle, back, or forward click.
-- **Per-application profiles** — Mouser auto-switches mappings when the foreground app changes (e.g. Chrome vs. VS Code).
+- **Per-application profiles** — LogiLite auto-switches mappings when the foreground app changes (e.g. Chrome vs. VS Code).
 - **Custom keyboard shortcuts** — record any key combination (e.g. `Ctrl+Shift+P`) directly in the UI.
 - **40+ built-in actions** — navigation, browser, editing, media, scroll-mode, and DPI shortcuts that adapt per platform.
 
@@ -119,15 +119,15 @@ That's it. The app opens, drops a tray / menu-bar icon, and starts remapping imm
 ### Cross-platform
 
 - **Windows, macOS, and Linux** — native hooks per platform (`WH_MOUSE_LL`, `CGEventTap`, `evdev` + `uinput`).
-- **Native Intel and Apple Silicon macOS builds** — separate `Mouser-macOS-intel.zip` and `Mouser-macOS.zip` artifacts; the menu-bar app runs as `LSUIElement` (no Dock icon).
+- **Native Intel and Apple Silicon macOS builds** — separate `LogiLite-macOS-intel.zip` and `LogiLite-macOS.zip` artifacts; the menu-bar app runs as `LSUIElement` (no Dock icon).
 - **Resizable UI** — main window starts at 1060 × 700 with a 920 × 620 minimum; the mouse diagram and controls reflow as you resize.
-- **Start at login** — Windows registry key, macOS LaunchAgent, and Linux XDG autostart, with an independent **Start minimized** option that boots straight into the tray. Linux autostart intentionally waits about 15 seconds after login so Bluetooth / HID devices are usually ready before Mouser restores device settings.
+- **Start at login** — Windows registry key, macOS LaunchAgent, and Linux XDG autostart, with an independent **Start minimized** option that boots straight into the tray. Linux autostart intentionally waits about 15 seconds after login so Bluetooth / HID devices are usually ready before LogiLite restores device settings.
 - **Single-instance guard** — launching a second copy brings the existing window to the front instead of starting a duplicate.
 
 ### Smart connectivity
 
 - **Bluetooth and Logi Bolt** — both transports are supported on all three platforms; the UI labels the live connection (`Logi Bolt` only when the receiver PID is positively identified).
-- **Auto-reconnection** — Mouser watches for power-off / on cycles and rebinds HID++ + the OS mouse hook without a restart; SmartShift settings are replayed on every reconnect (including wake-from-sleep).
+- **Auto-reconnection** — LogiLite watches for power-off / on cycles and rebinds HID++ + the OS mouse hook without a restart; SmartShift settings are replayed on every reconnect (including wake-from-sleep).
 - **Live connection status** — real-time Connected / Not Connected badge, model name, and active layout in the UI.
 - **Device-aware UI** — interactive MX Master and MX Anywhere diagrams with clickable hotspots; generic fallback card for other models, with an experimental layout-override picker.
 
@@ -193,7 +193,7 @@ Action labels adapt per platform. Windows exposes `Win+D` and `Task View`; macOS
 
 ## Build from source
 
-You only need this if you want to hack on Mouser or run a development build. Most users should grab a release zip — see [Download & Run](#download--run).
+You only need this if you want to hack on LogiLite or run a development build. Most users should grab a release zip — see [Download & Run](#download--run).
 
 ### Common prerequisites
 
@@ -204,8 +204,8 @@ You only need this if you want to hack on Mouser or run a development build. Mos
 - `git` and a working build toolchain
 
 ```bash
-git clone https://github.com/TomBadash/Mouser.git
-cd Mouser
+git clone https://github.com/delbust/LogiLite.git
+cd LogiLite
 python -m venv .venv
 ```
 
@@ -227,7 +227,7 @@ build.bat                # standard
 build.bat --clean        # force clean rebuild
 ```
 
-`build.bat` installs requirements, verifies that `hidapi` is importable, and packages with PyInstaller. The output lives in `dist\Mouser\` — zip the folder and ship it.
+`build.bat` installs requirements, verifies that `hidapi` is importable, and packages with PyInstaller. The output lives in `dist\LogiLite\` — zip the folder and ship it.
 
 To launch a source checkout without a console window, create a shortcut that uses `pythonw.exe`; see [DEVELOPMENT.md](DEVELOPMENT.md#desktop-shortcut-windows).
 
@@ -249,18 +249,18 @@ pip install pyinstaller
 ./build_macos_app.sh
 ```
 
-The output is `dist/Mouser.app`. The script reuses `images/AppIcon.icns` when present, otherwise generates one from `images/logo_icon.png`. Signing depends on whether `MOUSER_SIGN_IDENTITY` is set in the environment:
+The output is `dist/LogiLite.app`. The script reuses `images/AppIcon.icns` when present, otherwise generates one from `images/logo_icon.png`. Signing depends on whether `LOGILITE_SIGN_IDENTITY` is set in the environment:
 
 - **Unset (default)**: ad-hoc signs with `codesign --sign -`. Convenient for one-off builds, but the bundle's code identity can change on rebuild, so macOS may ask for Accessibility permission again.
-- **Set to a codesigning identity** (`security find-identity -v -p codesigning` to list them — SHA-1 form preferred): signs every nested `.dylib` / `.so` / `.framework` with hardened runtime options, then signs the outer app with the hardened-runtime exceptions at `build_resources/Mouser.entitlements`. This is a local developer signing path for repeated builds; stable macOS permission behavior depends on keeping the same source, resolved Python interpreter, dependency versions, architecture, signing identity, entitlements, and timestamp policy. A failing `codesign --verify --deep --strict` check aborts the build.
+- **Set to a codesigning identity** (`security find-identity -v -p codesigning` to list them — SHA-1 form preferred): signs every nested `.dylib` / `.so` / `.framework` with hardened runtime options, then signs the outer app with the hardened-runtime exceptions at `build_resources/LogiLite.entitlements`. This is a local developer signing path for repeated builds; stable macOS permission behavior depends on keeping the same source, resolved Python interpreter, dependency versions, architecture, signing identity, entitlements, and timestamp policy. A failing `codesign --verify --deep --strict` check aborts the build.
 
 ```sh
-MOUSER_SIGN_IDENTITY="ABCD1234..." ./build_macos_app.sh   # local signed build
+LOGILITE_SIGN_IDENTITY="ABCD1234..." ./build_macos_app.sh   # local signed build
 ```
 
 - This is **not** a notarized release-signing flow. Public macOS release zips remain ad-hoc signed until a separate Developer ID signing, secure timestamp, notarization, stapling, and Gatekeeper validation workflow exists.
 - Build on the architecture you want to ship: an `arm64` Python produces an Apple Silicon bundle, an `x86_64` Python produces an Intel bundle. Set `PYINSTALLER_TARGET_ARCH=arm64|x86_64|universal2` to override.
-- Release CI publishes both `Mouser-macOS.zip` (Apple Silicon) and `Mouser-macOS-intel.zip` (Intel) automatically on tag pushes.
+- Release CI publishes both `LogiLite-macOS.zip` (Apple Silicon) and `LogiLite-macOS-intel.zip` (Intel) automatically on tag pushes.
 - Accessibility permission is required. See [readme_mac_osx.md](readme_mac_osx.md) for the full grant flow and platform-specific notes.
 
 </details>
@@ -281,24 +281,24 @@ python main_qml.py
 # Build a portable bundle
 sudo apt-get install libhidapi-dev
 pip install pyinstaller
-pyinstaller Mouser-linux.spec --noconfirm
+pyinstaller LogiLite-linux.spec --noconfirm
 ```
 
-The helper installs `69-mouser-logitech.rules`, reloads `udev`, and tries to `modprobe uinput`. After a successful run, reconnect the mouse, fully quit Mouser, and launch normally — no `sudo`. On systems without logind / `uaccess`, adding the user to the `input` group is the distro-specific fallback.
+The helper installs `69-logilite-logitech.rules`, reloads `udev`, and tries to `modprobe uinput`. After a successful run, reconnect the mouse, fully quit LogiLite, and launch normally — no `sudo`. On systems without logind / `uaccess`, adding the user to the `input` group is the distro-specific fallback.
 
 The first normal Linux launch creates or refreshes:
 
 ```text
-~/.local/share/applications/io.github.tombadash.mouser.desktop
+~/.local/share/applications/io.github.delbust.logilite.desktop
 ```
 
-The generated launcher uses absolute paths for the current portable app or source checkout. If you move the checkout, launch Mouser once from the new path to refresh the app-menu entry. Enabling **Start at login** also manages:
+The generated launcher uses absolute paths for the current portable app or source checkout. If you move the checkout, launch LogiLite once from the new path to refresh the app-menu entry. Enabling **Start at login** also manages:
 
 ```text
-~/.config/autostart/io.github.tombadash.mouser.desktop
+~/.config/autostart/io.github.delbust.logilite.desktop
 ```
 
-That Linux autostart entry includes a short GNOME startup delay so Mouser does not race Bluetooth / HID initialization immediately after login.
+That Linux autostart entry includes a short GNOME startup delay so LogiLite does not race Bluetooth / HID initialization immediately after login.
 
 `xdotool` enables per-app profile switching on X11; `kdotool` adds KDE Wayland support. Other Wayland compositors fall back to the default profile.
 
@@ -313,11 +313,11 @@ For project layout, the architecture diagram, the HID++ gesture detector, the En
 ## Limitations
 
 - **Per-device mappings aren't fully separated yet** — layout overrides are stored per detected device, but profile mappings are still global.
-- **Conflicts with Logitech Options+** — both apps fight over HID++ access. Quit Options+ before running Mouser.
+- **Conflicts with Logitech Options+** — both apps fight over HID++ access. Quit Options+ before running LogiLite.
 - **Scroll inversion** uses coalesced post-injection on Windows to avoid LL-hook deadlocks; it's stable in mainstream apps but may misbehave in some games or low-level drivers.
-- **Admin not required** — but injected keystrokes may not reach elevated windows or some games. Run Mouser elevated if you need that path.
+- **Admin not required** — but injected keystrokes may not reach elevated windows or some games. Run LogiLite elevated if you need that path.
 - **Linux app detection is partial** — X11 works via `xdotool`, KDE Wayland works via `kdotool`, GNOME / other Wayland compositors still fall back to the default profile.
-- **Linux device permissions** — Mouser needs access to `/dev/hidraw*`, `/dev/input/event*`, and `/dev/uinput`. Use [`install-linux-permissions.sh`](packaging/linux/install-linux-permissions.sh) once instead of running as root.
+- **Linux device permissions** — LogiLite needs access to `/dev/hidraw*`, `/dev/input/event*`, and `/dev/uinput`. Use [`install-linux-permissions.sh`](packaging/linux/install-linux-permissions.sh) once instead of running as root.
 
 ---
 
@@ -350,7 +350,7 @@ Contributions are welcome.
 
 ## Support the project
 
-If Mouser saves you from installing Logitech Options+, consider supporting development:
+If LogiLite saves you from installing Logitech Options+, consider supporting development:
 
 <p align="center">
   <a href="https://github.com/sponsors/TomBadash">
@@ -381,4 +381,4 @@ Every bit helps keep the project going — thank you.
 
 This project is licensed under the [MIT License](LICENSE).
 
-**Mouser** is not affiliated with or endorsed by Logitech. "Logitech", "MX Master", and "Options+" are trademarks of Logitech International S.A.
+**LogiLite** is not affiliated with or endorsed by Logitech. "Logitech", "MX Master", and "Options+" are trademarks of Logitech International S.A.

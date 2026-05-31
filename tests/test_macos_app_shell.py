@@ -13,10 +13,10 @@ except Exception:  # pragma: no cover - env without PySide6 / project deps
 @unittest.skipIf(main_qml is None, "main_qml / PySide6 not available")
 class MacOSLauncherPathTests(unittest.TestCase):
     def test_named_executable_uses_venv_shim_directory(self):
-        executable = "/tmp/Mouser/.venv/bin/python"
+        executable = "/tmp/LogiLite/.venv/bin/python"
 
         def fake_isfile(path):
-            return path in {executable, "/tmp/Mouser/.venv/pyvenv.cfg"}
+            return path in {executable, "/tmp/LogiLite/.venv/pyvenv.cfg"}
 
         with (
             patch.object(main_qml.sys, "executable", executable),
@@ -24,18 +24,18 @@ class MacOSLauncherPathTests(unittest.TestCase):
         ):
             self.assertEqual(
                 main_qml._macos_named_executable_path(),
-                "/tmp/Mouser/.venv/bin/Mouser",
+                "/tmp/LogiLite/.venv/bin/LogiLite",
             )
 
     def test_named_executable_uses_project_fallback_outside_venv(self):
         with (
             patch.object(main_qml.sys, "executable", "/usr/bin/python3"),
             patch.object(main_qml.os.path, "isfile", return_value=False),
-            patch.object(main_qml, "ROOT", "/tmp/Mouser"),
+            patch.object(main_qml, "ROOT", "/tmp/LogiLite"),
         ):
             self.assertEqual(
                 main_qml._macos_named_executable_path(),
-                "/tmp/Mouser/build/macos/bin/Mouser",
+                "/tmp/LogiLite/build/macos/bin/LogiLite",
             )
 
     def test_relaunch_noops_off_macos(self):
@@ -43,16 +43,16 @@ class MacOSLauncherPathTests(unittest.TestCase):
             patch.object(main_qml.sys, "platform", "linux"),
             patch.object(main_qml.os, "execv") as execv,
         ):
-            main_qml._maybe_relaunch_with_mouser_process_name()
+            main_qml._maybe_relaunch_with_logilite_process_name()
         execv.assert_not_called()
 
     def test_relaunch_stages_symlink_and_execs_named_path(self):
-        executable = "/tmp/Mouser/.venv/bin/python"
-        target = "/tmp/Mouser/.venv/bin/Mouser"
+        executable = "/tmp/LogiLite/.venv/bin/python"
+        target = "/tmp/LogiLite/.venv/bin/LogiLite"
         staging = f"{target}.staging.1234"
 
         def fake_isfile(path):
-            return path in {executable, "/tmp/Mouser/.venv/pyvenv.cfg"}
+            return path in {executable, "/tmp/LogiLite/.venv/pyvenv.cfg"}
 
         with (
             patch.object(main_qml.sys, "platform", "darwin"),
@@ -66,9 +66,9 @@ class MacOSLauncherPathTests(unittest.TestCase):
             patch.object(main_qml.os, "execv") as execv,
             patch.dict(main_qml.os.environ, {}, clear=True),
         ):
-            main_qml._maybe_relaunch_with_mouser_process_name()
+            main_qml._maybe_relaunch_with_logilite_process_name()
 
-        makedirs.assert_called_once_with("/tmp/Mouser/.venv/bin", exist_ok=True)
+        makedirs.assert_called_once_with("/tmp/LogiLite/.venv/bin", exist_ok=True)
         symlink.assert_called_once_with(executable, staging)
         replace.assert_called_once_with(staging, target)
         execv.assert_called_once_with(target, [target, "main_qml.py", "--show-window"])
@@ -301,7 +301,7 @@ class MacOSQuitAndAccessibilityTests(unittest.TestCase):
 
         callback()
         tray.showMessage.assert_called_once_with(
-            "Mouser",
+            "LogiLite",
             "translated:tray.tray_message",
             main_qml.QSystemTrayIcon.MessageIcon.Information,
             5000,

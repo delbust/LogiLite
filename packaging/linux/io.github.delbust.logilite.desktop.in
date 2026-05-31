@@ -11,7 +11,7 @@ Terminal=false
 StartupNotify=false
 Categories=Settings;Utility;
 Keywords=mouse;logitech;buttons;remap;
-StartupWMClass=Mouser
-X-Mouser-Generated=true
-X-Mouser-SourcePath=@SOURCE_PATH@
+StartupWMClass=LogiLite
+X-LogiLite-Generated=true
+X-LogiLite-SourcePath=@SOURCE_PATH@
 @AUTOSTART_LINES@

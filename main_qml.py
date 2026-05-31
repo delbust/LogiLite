@@ -1,5 +1,5 @@
 """
-Mouser -- QML Entry Point
+LogiLite -- QML Entry Point
 ==============================
 Launches the Qt Quick / QML UI with PySide6.
 Replaces the old tkinter-based main.py.
@@ -115,7 +115,7 @@ _SINGLE_INSTANCE_ACTIVATE_MSG = b"show"
 def _single_instance_server_name() -> str:
     raw = f"{getpass.getuser()}\0{sys.platform}"
     digest = hashlib.sha256(raw.encode("utf-8", errors="replace")).hexdigest()[:16]
-    return f"mouser_instance_{digest}"
+    return f"logilite_instance_{digest}"
 
 
 def _try_activate_existing_instance(server_name: str, timeout_ms: int = 500) -> bool:
@@ -146,7 +146,7 @@ def _single_instance_acquire(app: QApplication, server_name: str):
     if server.listen(server_name):
         return server, None
     if server.serverError() != QAbstractSocket.SocketError.AddressInUseError:
-        print(f"[Mouser] single-instance server: {server.errorString()}")
+        print(f"[LogiLite] single-instance server: {server.errorString()}")
         return None, 1
     for _ in range(3):
         time.sleep(0.05)
@@ -156,7 +156,7 @@ def _single_instance_acquire(app: QApplication, server_name: str):
         server.close()
         if server.listen(server_name):
             return server, None
-    print("[Mouser] Could not claim single-instance lock or reach running instance.")
+    print("[LogiLite] Could not claim single-instance lock or reach running instance.")
     return None, 1
 
 
@@ -171,7 +171,7 @@ def _app_icon() -> QIcon:
     icon_name = "logo_icon.png" if sys.platform == "darwin" else "logo.ico"
     icon_path = os.path.join(ROOT, "images", icon_name)
     if not os.path.isfile(icon_path):
-        print(f"[Mouser] App icon missing: {icon_path}")
+        print(f"[LogiLite] App icon missing: {icon_path}")
         return QIcon()
     return QIcon(icon_path)
 
@@ -218,11 +218,11 @@ def _tray_icon() -> QIcon:
     return icon
 
 
-_MACOS_RELAUNCH_GUARD = "MOUSER_MACOS_RELAUNCHED"
+_MACOS_RELAUNCH_GUARD = "LOGILITE_MACOS_RELAUNCHED"
 
 
 def _macos_named_executable_path() -> str:
-    """Return a stable path for the `Mouser`-named launcher symlink.
+    """Return a stable path for the `LogiLite`-named launcher symlink.
 
     When ``sys.executable`` is in a virtualenv, place the symlink next to
     the venv's python shim so `pyvenv.cfg` discovery still resolves
@@ -232,23 +232,23 @@ def _macos_named_executable_path() -> str:
     exec_dir = os.path.dirname(sys.executable)
     pyvenv_cfg = os.path.join(os.path.dirname(exec_dir), "pyvenv.cfg")
     if os.path.isfile(pyvenv_cfg):
-        return os.path.join(exec_dir, "Mouser")
-    return os.path.join(ROOT, "build", "macos", "bin", "Mouser")
+        return os.path.join(exec_dir, "LogiLite")
+    return os.path.join(ROOT, "build", "macos", "bin", "LogiLite")
 
 
-def _maybe_relaunch_with_mouser_process_name() -> None:
-    """Re-exec the interpreter through a `Mouser`-named symlink.
+def _maybe_relaunch_with_logilite_process_name() -> None:
+    """Re-exec the interpreter through a `LogiLite`-named symlink.
 
     macOS reads the user-visible process name from the Mach-O image
     header at execve() time. For a bundle-less launch (``python
     main_qml.py``) that means the Dock tile, Cmd+Tab caption, Force
     Quit, and Activity Monitor all read "python", and there is no
     in-process API to rename the image afterwards. Re-execing through
-    a symlink whose basename is `Mouser` is the only reliable fix.
+    a symlink whose basename is `LogiLite` is the only reliable fix.
 
     Returns immediately on non-macOS, on PyInstaller-frozen bundles
     (already correctly named), when the env-var guard shows we already
-    relaunched, when the basename already starts with "mouser", or
+    relaunched, when the basename already starts with "logilite", or
     when the symlink can't be staged.
     """
     if sys.platform != "darwin":
@@ -259,13 +259,13 @@ def _maybe_relaunch_with_mouser_process_name() -> None:
         return
     source_executable = sys.executable
     if not source_executable or not os.path.isfile(source_executable):
-        print("[Mouser] sys.executable missing or not a file; skipping relaunch")
+        print("[LogiLite] sys.executable missing or not a file; skipping relaunch")
         return
     # Important: link the venv shim (`sys.executable`), NOT the underlying
     # interpreter (`os.path.realpath(sys.executable)`). The shim is what
     # holds the venv's identity; the real interpreter has no venv context.
     current_basename = os.path.basename(source_executable)
-    if current_basename.lower().startswith("mouser"):
+    if current_basename.lower().startswith("logilite"):
         return
     target = _macos_named_executable_path()
     target_dir = os.path.dirname(target)
@@ -295,12 +295,12 @@ def _maybe_relaunch_with_mouser_process_name() -> None:
                 pass
             raise
     except OSError as exc:
-        print(f"[Mouser] Could not stage Mouser-named launcher: {exc}")
+        print(f"[LogiLite] Could not stage LogiLite-named launcher: {exc}")
         return
     os.environ[_MACOS_RELAUNCH_GUARD] = "1"
     new_argv = [target, *sys.argv]
     print(
-        f"[Mouser] Re-execing through {target} so the Dock shows 'Mouser' "
+        f"[LogiLite] Re-execing through {target} so the Dock shows 'LogiLite' "
         f"instead of '{current_basename}'"
     )
     try:
@@ -308,7 +308,7 @@ def _maybe_relaunch_with_mouser_process_name() -> None:
     except OSError as exc:
         # If exec fails for any reason, fall back to in-place launch so
         # the user still gets a working app, just with the wrong label.
-        print(f"[Mouser] Re-exec failed: {exc}; continuing with current process")
+        print(f"[LogiLite] Re-exec failed: {exc}; continuing with current process")
         os.environ.pop(_MACOS_RELAUNCH_GUARD, None)
 
 
@@ -326,11 +326,11 @@ def _rename_macos_bundle_for_dock():
         info = bundle.localizedInfoDictionary() or bundle.infoDictionary()
         if info is None:
             return
-        info["CFBundleName"] = "Mouser"
-        info["CFBundleDisplayName"] = "Mouser"
-        info.setdefault("CFBundleExecutable", "Mouser")
+        info["CFBundleName"] = "LogiLite"
+        info["CFBundleDisplayName"] = "LogiLite"
+        info.setdefault("CFBundleExecutable", "LogiLite")
     except Exception as exc:
-        print(f"[Mouser] Could not pre-rename bundle for Dock: {exc}")
+        print(f"[LogiLite] Could not pre-rename bundle for Dock: {exc}")
 
 
 # Cached AppKit module + Dock-icon NSImage + last-applied activation policy.
@@ -484,7 +484,7 @@ if _MacOSNSObject is not None:
             try:
                 _dispatch_macos_status_item_click(getattr(self, "_py_handlers", {}))
             except Exception as exc:  # noqa: BLE001
-                print(f"[Mouser] status-item click handler raised: {exc}")
+                print(f"[LogiLite] status-item click handler raised: {exc}")
 else:
     _MacOSStatusItemTarget = None
 
@@ -514,7 +514,7 @@ class _MacOSQuitToTrayFilter(QObject):
                 event.ignore()
             return True
         except Exception as exc:  # noqa: BLE001
-            print(f"[Mouser] Failed to hide on macOS quit event: {exc}")
+            print(f"[LogiLite] Failed to hide on macOS quit event: {exc}")
             return False
 
 
@@ -537,7 +537,7 @@ def _macos_appkit():
     try:
         import AppKit
     except Exception as exc:
-        print(f"[Mouser] Failed to import AppKit: {exc}")
+        print(f"[LogiLite] Failed to import AppKit: {exc}")
         return None
     _MACOS_APPKIT = AppKit
     return AppKit
@@ -546,12 +546,12 @@ def _macos_appkit():
 def _configure_macos_app_mode():
     """Initial activation policy at launch time. Stays Accessory (menu-bar
     only) until the window opens, at which point we promote to Regular so
-    Mouser becomes a real Cmd+Tab-able foreground app."""
+    LogiLite becomes a real Cmd+Tab-able foreground app."""
     _set_macos_activation_policy(regular=False)
 
 
 def _install_macos_dock_icon():
-    """Replace the Dock / Cmd+Tab / Mission Control icon with Mouser's
+    """Replace the Dock / Cmd+Tab / Mission Control icon with LogiLite's
     logo. Qt's ``app.setWindowIcon()`` only covers the title bar on
     macOS, so without this override a bare ``python main_qml.py`` shows
     the generic Python launcher icon. The decoded NSImage is cached at
@@ -567,15 +567,15 @@ def _install_macos_dock_icon():
     if _MACOS_DOCK_ICON_NSIMAGE is None:
         icon_path = os.path.join(ROOT, "images", "logo_icon.png")
         if not os.path.isfile(icon_path):
-            print(f"[Mouser] Could not load Dock icon from {icon_path}")
+            print(f"[LogiLite] Could not load Dock icon from {icon_path}")
             return
         try:
             ns_image = appkit.NSImage.alloc().initWithContentsOfFile_(icon_path)
         except Exception as exc:
-            print(f"[Mouser] Failed to decode Dock icon {icon_path}: {exc}")
+            print(f"[LogiLite] Failed to decode Dock icon {icon_path}: {exc}")
             return
         if ns_image is None:
-            print(f"[Mouser] Could not load Dock icon from {icon_path}")
+            print(f"[LogiLite] Could not load Dock icon from {icon_path}")
             return
         # NSImage may flag the image as "template" (auto-tinted to the
         # system colors, which strips our gradient and renders the
@@ -585,21 +585,21 @@ def _install_macos_dock_icon():
             ns_image.setTemplate_(False)
         size = ns_image.size()
         print(
-            f"[Mouser] Dock icon loaded {icon_path} "
+            f"[LogiLite] Dock icon loaded {icon_path} "
             f"size={size.width:.0f}x{size.height:.0f}"
         )
         _MACOS_DOCK_ICON_NSIMAGE = ns_image
     try:
         appkit.NSApp.setApplicationIconImage_(_MACOS_DOCK_ICON_NSIMAGE)
     except Exception as exc:
-        print(f"[Mouser] Failed to apply macOS Dock icon: {exc}")
+        print(f"[LogiLite] Failed to apply macOS Dock icon: {exc}")
 
 
 def _set_macos_activation_policy(regular: bool) -> None:
     """Toggle between the Regular (foreground, Dock + Cmd+Tab) and
     Accessory (menu-bar only) policies. On a Regular promotion AppKit
     creates the Dock tile lazily and seeds the icon from the running
-    executable's bundle, so this also re-applies the Mouser Dock icon
+    executable's bundle, so this also re-applies the LogiLite Dock icon
     after the flip. Skips the AppKit round-trip when the requested
     state already matches the last-applied one, which keeps rapid
     ``visibilityChanged`` storms cheap.
@@ -619,7 +619,7 @@ def _set_macos_activation_policy(regular: bool) -> None:
         )
         appkit.NSApp.setActivationPolicy_(policy)
     except Exception as exc:
-        print(f"[Mouser] Failed to set macOS activation policy: {exc}")
+        print(f"[LogiLite] Failed to set macOS activation policy: {exc}")
         return
     _MACOS_ACTIVATION_POLICY_REGULAR = regular
     if regular:
@@ -633,7 +633,7 @@ def _activate_macos_window():
         import AppKit
         AppKit.NSApp.activateIgnoringOtherApps_(True)
     except Exception as exc:
-        print(f"[Mouser] Failed to activate macOS window: {exc}")
+        print(f"[LogiLite] Failed to activate macOS window: {exc}")
 
 
 def _install_native_macos_status_item(qmenu, on_left_click):
@@ -659,18 +659,18 @@ def _install_native_macos_status_item(qmenu, on_left_click):
     if appkit is None:
         return None
     if _MacOSStatusItemTarget is None:
-        print("[Mouser] Foundation.NSObject unavailable; using Qt tray icon")
+        print("[LogiLite] Foundation.NSObject unavailable; using Qt tray icon")
         return None
     try:
         from PySide6.QtGui import QCursor
         from PySide6.QtCore import QPoint
     except Exception as exc:
-        print(f"[Mouser] Native status-item bootstrap failed: {exc}")
+        print(f"[LogiLite] Native status-item bootstrap failed: {exc}")
         return None
 
     icon_svg = os.path.join(ROOT, "images", "icons", "mouse-simple.svg")
     if not os.path.isfile(icon_svg):
-        print(f"[Mouser] mouse-simple.svg not found at {icon_svg}")
+        print(f"[LogiLite] mouse-simple.svg not found at {icon_svg}")
         return None
 
     # Render the SVG into a 22 px square NSImage. 22 is the macOS-
@@ -679,12 +679,12 @@ def _install_native_macos_status_item(qmenu, on_left_click):
     # edges on both retina and non-retina displays.
     icon_png = _render_svg_pixmap(icon_svg, _qcolor_white(), 22)
     if icon_png.isNull():
-        print("[Mouser] could not render mouse-simple.svg for status item")
+        print("[LogiLite] could not render mouse-simple.svg for status item")
         return None
     icon_bytes = _qpixmap_to_png_bytes(icon_png)
     ns_image = appkit.NSImage.alloc().initWithData_(icon_bytes)
     if ns_image is None or ns_image.isValid() is False:
-        print("[Mouser] NSImage failed to decode status-item PNG")
+        print("[LogiLite] NSImage failed to decode status-item PNG")
         return None
     ns_image.setTemplate_(True)
     ns_image.setSize_(appkit.NSMakeSize(22, 22))
@@ -695,11 +695,11 @@ def _install_native_macos_status_item(qmenu, on_left_click):
     status_item = status_bar.statusItemWithLength_(-1.0)
     button = status_item.button()
     if button is None:
-        print("[Mouser] NSStatusItem has no button; bailing")
+        print("[LogiLite] NSStatusItem has no button; bailing")
         status_bar.removeStatusItem_(status_item)
         return None
     button.setImage_(ns_image)
-    button.setToolTip_("Mouser")
+    button.setToolTip_("LogiLite")
 
     # Attach the existing QMenu as the right-click / control-click
     # menu via a tiny NSMenu shim that pops the Qt menu at the
@@ -715,7 +715,7 @@ def _install_native_macos_status_item(qmenu, on_left_click):
         try:
             qmenu.popup(cursor_pos)
         except Exception as exc:  # noqa: BLE001
-            print(f"[Mouser] failed to popup tray menu: {exc}")
+            print(f"[LogiLite] failed to popup tray menu: {exc}")
 
     target = _MacOSStatusItemTarget.alloc().init()
     target.setPyHandlers_(
@@ -731,7 +731,7 @@ def _install_native_macos_status_item(qmenu, on_left_click):
         )
         button.sendActionOn_(click_mask)
     except Exception as exc:
-        print(f"[Mouser] Could not configure status-item click mask: {exc}")
+        print(f"[LogiLite] Could not configure status-item click mask: {exc}")
         status_bar.removeStatusItem_(status_item)
         return None
 
@@ -890,10 +890,10 @@ def _check_accessibility(locale_mgr: "LocaleManager") -> bool:
     try:
         trusted = is_process_trusted(prompt=True)
     except Exception as exc:
-        print(f"[Mouser] Accessibility check failed: {exc}")
+        print(f"[LogiLite] Accessibility check failed: {exc}")
         return False
     if not trusted:
-        print("[Mouser] Accessibility permission not granted")
+        print("[LogiLite] Accessibility permission not granted")
         msg = QMessageBox()
         msg.setIcon(QMessageBox.Icon.Warning)
         msg.setWindowTitle(locale_mgr.tr("accessibility.title"))
@@ -912,11 +912,11 @@ def _runtime_launch_path() -> str:
 
 def _schedule_engine_start(engine, *, accessibility_granted: bool) -> bool:
     if not accessibility_granted:
-        print("[Mouser] Engine not started -- Accessibility permission is required")
+        print("[LogiLite] Engine not started -- Accessibility permission is required")
         return False
     QTimer.singleShot(0, lambda: (
         engine.start(),
-        print("[Mouser] Engine started -- remapping is active"),
+        print("[LogiLite] Engine started -- remapping is active"),
     ))
     return True
 
@@ -924,7 +924,7 @@ def _schedule_engine_start(engine, *, accessibility_granted: bool) -> bool:
 def _schedule_tray_minimized_notice(tray, locale_mgr) -> None:
     def _tray_minimized_notice():
         tray.showMessage(
-            "Mouser",
+            "LogiLite",
             locale_mgr.tr("tray.tray_message"),
             QSystemTrayIcon.MessageIcon.Information,
             5000,
@@ -934,17 +934,17 @@ def _schedule_tray_minimized_notice(tray, locale_mgr) -> None:
 
 
 def main():
-    # Re-exec through a `Mouser`-named symlink BEFORE anything Qt or
+    # Re-exec through a `LogiLite`-named symlink BEFORE anything Qt or
     # AppKit related runs. Necessary because macOS reads the Dock label /
     # Cmd+Tab caption from the executable basename at process creation;
     # there is no in-process API to rename a Mach-O image after the fact.
     # No-op when already relaunched, on non-macOS platforms, or when the
     # symlink can't be created.
-    _maybe_relaunch_with_mouser_process_name()
+    _maybe_relaunch_with_logilite_process_name()
 
     _print_startup_times()
     _t5 = _time.perf_counter()
-    if len(sys.argv) >= 3 and sys.argv[1] == "--mouser-apply-update":
+    if len(sys.argv) >= 3 and sys.argv[1] == "--logilite-apply-update":
         from core.update_installer import apply_windows_update_from_state
 
         raise SystemExit(apply_windows_update_from_state(sys.argv[2]))
@@ -963,23 +963,23 @@ def main():
 
     # Also: also mutate the bundle's display name keys so
     # surfaces that read from `[NSBundle mainBundle]` (application menu
-    # first item, Force Quit, notification banners) say "Mouser" too.
+    # first item, Force Quit, notification banners) say "LogiLite" too.
     _rename_macos_bundle_for_dock()
 
     QCoreApplication.setAttribute(Qt.ApplicationAttribute.AA_ShareOpenGLContexts)
     app = QApplication(argv)
-    app.setApplicationName("Mouser")
+    app.setApplicationName("LogiLite")
     app.setApplicationVersion(APP_VERSION)
-    app.setOrganizationName("Mouser")
+    app.setOrganizationName("LogiLite")
     app.setWindowIcon(_app_icon())
     app.setQuitOnLastWindowClosed(False)
     _configure_macos_app_mode()
     _install_macos_dock_icon()
     ui_state = UiState(app)
 
-    print(f"[Mouser] Version: {APP_VERSION} ({APP_BUILD_MODE})")
-    print(f"[Mouser] Commit: {APP_COMMIT_DISPLAY}")
-    print(f"[Mouser] Launch path: {_runtime_launch_path()}")
+    print(f"[LogiLite] Version: {APP_VERSION} ({APP_BUILD_MODE})")
+    print(f"[LogiLite] Commit: {APP_COMMIT_DISPLAY}")
+    print(f"[LogiLite] Launch path: {_runtime_launch_path()}")
 
     # ── Locale Manager ─────────────────────────────────────────
     initial_lang = cfg_settings.get("language", "en")
@@ -1024,6 +1024,7 @@ def main():
     qml_engine.rootContext().setContextProperty("uiState", ui_state)
     qml_engine.rootContext().setContextProperty("lm", locale_mgr)
     qml_engine.rootContext().setContextProperty("launchHidden", launch_hidden)
+    qml_engine.rootContext().setContextProperty("appName", "LogiLite")
     qml_engine.rootContext().setContextProperty("appVersion", APP_VERSION)
     qml_engine.rootContext().setContextProperty("appBuildMode", APP_BUILD_MODE)
     qml_engine.rootContext().setContextProperty("appCommit", APP_COMMIT_DISPLAY)
@@ -1035,7 +1036,7 @@ def main():
     _t8 = _time.perf_counter()
 
     if not qml_engine.rootObjects():
-        print("[Mouser] FATAL: Failed to load QML")
+        print("[LogiLite] FATAL: Failed to load QML")
         sys.exit(1)
 
     root_window = qml_engine.rootObjects()[0]
@@ -1122,7 +1123,7 @@ def main():
 
     # ── System Tray ────────────────────────────────────────────
     tray = QSystemTrayIcon(_tray_icon(), app)
-    tray.setToolTip("Mouser")
+    tray.setToolTip("LogiLite")
 
     tray_menu = QMenu()
 
@@ -1203,13 +1204,13 @@ def main():
             saved_cfg.setdefault("settings", {})["language"] = locale_mgr.language
             save_config(saved_cfg)
         except Exception as exc:
-            print(f"[Mouser] Failed to save language preference: {exc}")
+            print(f"[LogiLite] Failed to save language preference: {exc}")
 
     locale_mgr.languageChanged.connect(_update_tray_texts)
     locale_mgr.languageChanged.connect(_save_language)
 
     backend.updateAvailable.connect(lambda version, url: tray.showMessage(
-        "Mouser",
+        "LogiLite",
         locale_mgr.tr("tray.update_available").format(version=version),
         QSystemTrayIcon.MessageIcon.Information,
         8000,
@@ -1244,7 +1245,7 @@ def main():
         sys.exit(app.exec())
     finally:
         engine.stop()
-        print("[Mouser] Shut down cleanly")
+        print("[LogiLite] Shut down cleanly")
 
 
 if __name__ == "__main__":

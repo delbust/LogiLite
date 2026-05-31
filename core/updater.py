@@ -15,10 +15,10 @@ import urllib.request
 from core.version import APP_VERSION
 
 
-DEFAULT_RELEASE_REPO = "TomBadash/Mouser"
+DEFAULT_RELEASE_REPO = "delbust/LogiLite"
 _GITHUB_API = "https://api.github.com/repos/{repo}/releases/latest"
-_LATEST_RELEASE_URL_ENV = "MOUSER_UPDATE_LATEST_RELEASE_URL"
-_USER_AGENT = f"Mouser/{APP_VERSION}"
+_LATEST_RELEASE_URL_ENV = "LOGILITE_UPDATE_LATEST_RELEASE_URL"
+_USER_AGENT = f"LogiLite/{APP_VERSION}"
 DEFAULT_AUTO_CHECK_INTERVAL_SECONDS = 24 * 60 * 60
 
 

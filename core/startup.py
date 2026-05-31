@@ -8,17 +8,17 @@ import tempfile
 
 # Windows
 RUN_KEY = r"Software\Microsoft\Windows\CurrentVersion\Run"
-RUN_VALUE_NAME = "Mouser"
+RUN_VALUE_NAME = "LogiLite"
 
 # macOS
-MACOS_LAUNCH_AGENT_LABEL = "io.github.tombadash.mouser"
+MACOS_LAUNCH_AGENT_LABEL = "io.github.delbust.logilite"
 MACOS_PLIST_NAME = f"{MACOS_LAUNCH_AGENT_LABEL}.plist"
 
 # Linux
-LINUX_DESKTOP_ENTRY_NAME = "io.github.tombadash.mouser.desktop"
+LINUX_DESKTOP_ENTRY_NAME = "io.github.delbust.logilite.desktop"
 LINUX_DESKTOP_TEMPLATE_NAME = f"{LINUX_DESKTOP_ENTRY_NAME}.in"
 LINUX_AUTOSTART_DELAY_SECONDS = 15
-APP_DISPLAY_NAME = "Mouser"
+APP_DISPLAY_NAME = "LogiLite"
 
 
 def supports_login_startup():

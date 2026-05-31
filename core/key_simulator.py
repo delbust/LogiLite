@@ -1331,7 +1331,7 @@ elif sys.platform == "linux":
                 from evdev import ecodes, UInput
                 _virtual_kbd = UInput(
                     {ecodes.EV_KEY: _ALL_KEY_CODES + list(_LINUX_MOUSE_BUTTON_MAP.values())},
-                    name="Mouser Virtual Keyboard",
+                    name="LogiLite Virtual Keyboard",
                 )
                 return _virtual_kbd
             except ImportError:

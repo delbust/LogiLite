@@ -1,8 +1,8 @@
 # -*- mode: python ; coding: utf-8 -*-
 """
-PyInstaller spec file for Mouser
-Produces a single-directory portable build in  dist/Mouser/
-Run:  pyinstaller Mouser.spec
+PyInstaller spec file for LogiLite
+Produces a single-directory portable build in  dist/LogiLite/
+Run:  pyinstaller LogiLite.spec
 """
 
 import os
@@ -15,7 +15,7 @@ import PySide6
 block_cipher = None
 ROOT = os.path.abspath(".")
 PYSIDE6_DIR = os.path.dirname(PySide6.__file__)
-BUILD_INFO_PATH = os.path.join(ROOT, "build", "mouser_build_info.json")
+BUILD_INFO_PATH = os.path.join(ROOT, "build", "logilite_build_info.json")
 
 
 def _load_app_version() -> str:
@@ -56,8 +56,8 @@ def _git_dirty():
 
 
 def _write_build_info(version: str) -> str:
-    commit = os.environ.get("MOUSER_GIT_COMMIT", "").strip() or _run_git(["rev-parse", "HEAD"])
-    dirty_env = os.environ.get("MOUSER_GIT_DIRTY")
+    commit = os.environ.get("LOGILITE_GIT_COMMIT", "").strip() or _run_git(["rev-parse", "HEAD"])
+    dirty_env = os.environ.get("LOGILITE_GIT_DIRTY")
     if dirty_env:
         dirty = dirty_env.strip().lower() in {"1", "true", "yes", "on"}
     else:
@@ -233,7 +233,7 @@ exe = EXE(
     a.scripts,
     [],                     # not one-file (faster startup, easier debugging)
     exclude_binaries=True,
-    name="Mouser",
+    name="LogiLite",
     debug=False,
     bootloader_ignore_signals=False,
     strip=False,
@@ -251,14 +251,14 @@ coll = COLLECT(
     strip=False,
     upx=False,              # UPX OFF — faster cold start
     upx_exclude=[],
-    name="Mouser",
+    name="LogiLite",
 )
 
 # ── Post-build cleanup: remove Qt QML/plugin dirs we don't need ──────────
 # PyInstaller's hooks copy the entire PySide6 QML tree; we only need
 # QtQuick/Controls + Material, QtQml, QtQuick/Layouts, QtQuick/Templates,
 # QtQuick/Window.  Everything else is dead weight that slows startup.
-_dist = os.path.join("dist", "Mouser", "_internal", "PySide6")
+_dist = os.path.join("dist", "LogiLite", "_internal", "PySide6")
 
 # QML dirs to KEEP (everything else under qml/ is deleted)
 _keep_qml = {
@@ -311,17 +311,17 @@ def _cleanup():
         shutil.rmtree(trans, ignore_errors=True)
         print("  [cleanup] removed translations/")
 
-print("[Mouser] Post-build cleanup...")
+print("[LogiLite] Post-build cleanup...")
 _cleanup()
-print("[Mouser] Cleanup done.")
+print("[LogiLite] Cleanup done.")
 
 # ── macOS App Bundle ───────────────────────────────────────────────────
 if sys.platform == 'darwin':
     app = BUNDLE(
         coll,
-        name='Mouser.app',
+        name='LogiLite.app',
         icon='images/AppIcon.icns',
-        bundle_identifier='com.mouser.app',
+        bundle_identifier='com.logilite.app',
         info_plist={
             'CFBundleShortVersionString': APP_VERSION,
             'CFBundleVersion': APP_VERSION,

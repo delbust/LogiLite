@@ -13,8 +13,8 @@ ApplicationWindow {
     minimumHeight: 620
     readonly property string versionLabel: "v" + appVersion
     title: backend.mouseConnected
-           ? "Mouser " + versionLabel + " — " + backend.deviceDisplayName
-           : "Mouser " + versionLabel
+           ? appName + " " + versionLabel + " — " + backend.deviceDisplayName
+           : appName + " " + versionLabel
 
     property string appearanceMode: uiState.appearanceMode
     readonly property bool darkMode: appearanceMode === "dark"
@@ -81,7 +81,7 @@ ApplicationWindow {
 
                         Text {
                             anchors.centerIn: parent
-                            text: "M"
+                            text: "L"
                             font {
                                 family: uiState.fontFamily
                                 pixelSize: 20
@@ -96,7 +96,8 @@ ApplicationWindow {
                     Repeater {
                         model: [
                             { icon: "mouse-simple", tipKey: "nav.mouse_profiles", page: 0 },
-                            { icon: "sliders-horizontal", tipKey: "nav.point_scroll", page: 1 }
+                            { icon: "sliders-horizontal", tipKey: "nav.point_scroll", page: 1 },
+                            { icon: "keyboard", tipKey: "nav.keyboard", page: 2 }
                         ]
 
                         delegate: FocusScope {
@@ -258,6 +259,10 @@ ApplicationWindow {
                 active: root.currentPage === 1 || item
                 source: "ScrollPage.qml"
             }
+            Loader {
+                active: root.currentPage === 2 || item
+                source: "KeyboardPage.qml"
+            }
         }
     }
 
@@ -354,7 +359,7 @@ ApplicationWindow {
                         spacing: 3
 
                         Text {
-                            text: lm.strings["about.title"] || "About Mouser"
+                            text: lm.strings["about.title"] || "About LogiLite"
                             font { family: uiState.fontFamily; pixelSize: 17; bold: true }
                             color: theme.textPrimary
                         }

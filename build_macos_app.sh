@@ -4,13 +4,13 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BUILD_DIR="$ROOT_DIR/build/macos"
-ICONSET_DIR="$BUILD_DIR/Mouser.iconset"
+ICONSET_DIR="$BUILD_DIR/LogiLite.iconset"
 COMMITTED_ICON="$ROOT_DIR/images/AppIcon.icns"
-GENERATED_ICON="$BUILD_DIR/Mouser.icns"
+GENERATED_ICON="$BUILD_DIR/LogiLite.icns"
 SOURCE_ICON="$ROOT_DIR/images/logo_icon.png"
-ENTITLEMENTS="$ROOT_DIR/build_resources/Mouser.entitlements"
+ENTITLEMENTS="$ROOT_DIR/build_resources/LogiLite.entitlements"
 TARGET_ARCH="${PYINSTALLER_TARGET_ARCH:-}"
-SIGN_IDENTITY="${MOUSER_SIGN_IDENTITY:-}"
+SIGN_IDENTITY="${LOGILITE_SIGN_IDENTITY:-}"
 export PYINSTALLER_CONFIG_DIR="$BUILD_DIR/pyinstaller"
 PYTHON=""
 PYTHON_SOURCE=""
@@ -82,11 +82,11 @@ resolve_command() {
 resolve_python() {
   local candidate=""
 
-  if [[ -n "${MOUSER_PYTHON:-}" ]]; then
-    candidate="$(resolve_command "$MOUSER_PYTHON")" || \
-      fail "MOUSER_PYTHON is set but is not executable: $MOUSER_PYTHON"
+  if [[ -n "${LOGILITE_PYTHON:-}" ]]; then
+    candidate="$(resolve_command "$LOGILITE_PYTHON")" || \
+      fail "LOGILITE_PYTHON is set but is not executable: $LOGILITE_PYTHON"
     PYTHON="$candidate"
-    PYTHON_SOURCE="MOUSER_PYTHON"
+    PYTHON_SOURCE="LOGILITE_PYTHON"
     return
   fi
 
@@ -118,7 +118,7 @@ resolve_python() {
     return
   fi
 
-  fail "No Python interpreter found. Create .venv or set MOUSER_PYTHON."
+  fail "No Python interpreter found. Create .venv or set LOGILITE_PYTHON."
 }
 
 require_pyinstaller() {
@@ -148,12 +148,22 @@ log_python_provenance() {
 run_pyinstaller() {
   # PYTHONHASHSEED=0 pins set iteration so PyInstaller's base_library.zip
   # layout is byte-identical across rebuilds for the same toolchain inputs.
-  PYTHONHASHSEED=0 "$PYTHON" -m PyInstaller "$ROOT_DIR/Mouser-mac.spec" --noconfirm
+  PYTHONHASHSEED=0 "$PYTHON" -m PyInstaller "$ROOT_DIR/LogiLite-mac.spec" --noconfirm
+}
+
+clean_bundle_metadata() {
+  local app_path="$ROOT_DIR/dist/LogiLite.app"
+  [[ -d "$app_path" ]] || return 0
+  if command -v xattr >/dev/null 2>&1; then
+    echo "Clearing macOS extended attributes from app bundle"
+    xattr -cr "$app_path"
+  fi
 }
 
 sign_ad_hoc() {
   echo "Signing mode: ad-hoc"
-  codesign --force --deep --sign - "$ROOT_DIR/dist/Mouser.app"
+  codesign --force --deep --sign - "$ROOT_DIR/dist/LogiLite.app"
+  verify_bundle
 }
 
 entitlements_sha256() {
@@ -161,7 +171,7 @@ entitlements_sha256() {
 }
 
 sign_nested_code() {
-  local frameworks_dir="$ROOT_DIR/dist/Mouser.app/Contents/Frameworks"
+  local frameworks_dir="$ROOT_DIR/dist/LogiLite.app/Contents/Frameworks"
   [[ -d "$frameworks_dir" ]] || return 0
 
   while IFS= read -r -d '' nested; do
@@ -173,7 +183,7 @@ sign_nested_code() {
 }
 
 verify_bundle() {
-  codesign --verify --deep --strict --verbose=2 "$ROOT_DIR/dist/Mouser.app"
+  codesign --verify --deep --strict --verbose=2 "$ROOT_DIR/dist/LogiLite.app"
 }
 
 sign_with_identity() {
@@ -188,7 +198,7 @@ sign_with_identity() {
   codesign --force --options runtime --timestamp=none \
     --entitlements "$ENTITLEMENTS" \
     --sign "$SIGN_IDENTITY" \
-    "$ROOT_DIR/dist/Mouser.app"
+    "$ROOT_DIR/dist/LogiLite.app"
   verify_bundle
 }
 
@@ -209,6 +219,7 @@ resolve_python
 require_pyinstaller
 log_python_provenance
 run_pyinstaller
+clean_bundle_metadata
 sign_app
 
-echo "Build complete: $ROOT_DIR/dist/Mouser.app"
+echo "Build complete: $ROOT_DIR/dist/LogiLite.app"
