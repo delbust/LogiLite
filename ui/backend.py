@@ -7,6 +7,7 @@ import os
 import json
 import re
 import shutil
+import subprocess
 import sys
 import threading
 import time
@@ -215,6 +216,7 @@ class Backend(QObject):
     deviceLayoutChanged = Signal()
     knownAppsChanged = Signal()
     keyboardDevicesChanged = Signal()
+    accessibilityChanged = Signal()
     updateAvailable = Signal(str, str)
     updateInstallChanged = Signal()
 
@@ -589,7 +591,7 @@ class Backend(QObject):
     def isMacOS(self):
         return sys.platform == "darwin"
 
-    @Property(bool, constant=True)
+    @Property(bool, notify=accessibilityChanged)
     def accessibilityGranted(self):
         """Whether macOS Accessibility permission is granted (always True on other platforms)."""
         if sys.platform != "darwin":
@@ -598,6 +600,97 @@ class Backend(QObject):
             return bool(is_process_trusted())
         except Exception:
             return True
+
+    @Slot()
+    def refreshAccessibilityPermission(self):
+        self.accessibilityChanged.emit()
+        if self.accessibilityGranted:
+            self.statusMessage.emit("Accessibility permission granted")
+        else:
+            self.statusMessage.emit("Accessibility permission is still required")
+
+    @Slot()
+    def openAccessibilitySettings(self):
+        if sys.platform != "darwin":
+            return
+        url = "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility"
+        opened = _open_url(url)
+        if not opened:
+            try:
+                subprocess.run(["open", url], check=False)
+                opened = True
+            except Exception:
+                opened = False
+        self.statusMessage.emit(
+            "Opened Accessibility settings" if opened
+            else "Could not open Accessibility settings"
+        )
+
+    def _open_external(self, url, success_message, failure_message):
+        opened = _open_url(url)
+        if not opened and sys.platform == "darwin":
+            try:
+                subprocess.run(["open", url], check=False)
+                opened = True
+            except Exception:
+                opened = False
+        self.statusMessage.emit(success_message if opened else failure_message)
+
+    @Slot()
+    def openKeyboardSettings(self):
+        if sys.platform == "darwin":
+            url = "x-apple.systempreferences:com.apple.Keyboard-Settings.extension"
+        else:
+            url = "https://support.apple.com/guide/mac-help/change-keyboard-settings-mchlp2651/mac"
+        self._open_external(url, "Opened keyboard settings", "Could not open keyboard settings")
+
+    @Slot()
+    def openBluetoothSettings(self):
+        if sys.platform == "darwin":
+            url = "x-apple.systempreferences:com.apple.BluetoothSettings"
+        else:
+            url = "https://support.apple.com/guide/mac-help/connect-a-bluetooth-device-blth1004/mac"
+        self._open_external(url, "Opened Bluetooth settings", "Could not open Bluetooth settings")
+
+    @Slot()
+    def openKarabinerPage(self):
+        self._open_external(
+            "https://karabiner-elements.pqrs.org/",
+            "Opened Karabiner-Elements",
+            "Could not open Karabiner-Elements",
+        )
+
+    @Slot()
+    def openLogiOptionsPage(self):
+        self._open_external(
+            "https://www.logitech.com/en-us/software/logi-options-plus.html",
+            "Opened Logi Options+",
+            "Could not open Logi Options+",
+        )
+
+    @Slot()
+    def openLogitechGHubPage(self):
+        self._open_external(
+            "https://www.logitechg.com/en-us/innovation/g-hub.html",
+            "Opened Logitech G HUB",
+            "Could not open Logitech G HUB",
+        )
+
+    @Slot()
+    def openSolaarPage(self):
+        self._open_external(
+            "https://github.com/pwr-Solaar/Solaar",
+            "Opened Solaar",
+            "Could not open Solaar",
+        )
+
+    @Slot()
+    def openLogiopsPage(self):
+        self._open_external(
+            "https://github.com/PixlOne/logiops",
+            "Opened logiops",
+            "Could not open logiops",
+        )
 
     @Property(str, notify=activeProfileChanged)
     def activeProfile(self):
@@ -756,6 +849,10 @@ class Backend(QObject):
         if not self._keyboard_devices:
             return ""
         return ", ".join(str(device.get("name") or "Logitech keyboard") for device in self._keyboard_devices)
+
+    @Property(int, notify=keyboardDevicesChanged)
+    def keyboardConnectedCount(self):
+        return sum(1 for device in self._keyboard_devices if bool(device.get("connected", True)))
 
     def _catalog_app_id(self, spec):
         entry = app_catalog.resolve_app_spec(spec)
@@ -1465,6 +1562,18 @@ class Backend(QObject):
     @Slot()
     def refreshKeyboardDevices(self):
         self._refreshKeyboardDevices(silent=False)
+
+    @Slot()
+    def copyKeyboardInventory(self):
+        payload = {
+            "app": "LogiLite",
+            "platform": sys.platform,
+            "keyboardConnected": self.keyboardConnected,
+            "keyboardConnectedCount": self.keyboardConnectedCount,
+            "devices": self._keyboard_devices,
+        }
+        self.copyToClipboard(json.dumps(payload, indent=2, ensure_ascii=False))
+        self.statusMessage.emit("Keyboard inventory copied")
 
     @Slot(str)
     def deleteProfile(self, name):

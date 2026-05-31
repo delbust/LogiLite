@@ -76,18 +76,19 @@ ApplicationWindow {
                         width: 44
                         height: 44
                         radius: 14
-                        color: root.theme.accent
+                        color: root.darkMode ? "#ffffff" : root.theme.bgCard
+                        border.width: 1
+                        border.color: root.theme.border
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        Text {
+                        Image {
                             anchors.centerIn: parent
-                            text: "L"
-                            font {
-                                family: uiState.fontFamily
-                                pixelSize: 20
-                                bold: true
-                            }
-                            color: root.theme.bgSidebar
+                            width: 34
+                            height: 34
+                            source: "../../images/logo_icon.png"
+                            fillMode: Image.PreserveAspectFit
+                            smooth: true
+                            mipmap: true
                         }
                     }
 
@@ -248,22 +249,153 @@ ApplicationWindow {
             }
         }
 
-        StackLayout {
-            id: contentStack
+        ColumnLayout {
             Layout.fillWidth: true
             Layout.fillHeight: true
-            currentIndex: root.currentPage
+            spacing: 0
 
-            MousePage {}
-            Loader {
-                active: root.currentPage === 1 || item
-                source: "ScrollPage.qml"
+            Rectangle {
+                Layout.fillWidth: true
+                Layout.preferredHeight: visible ? 68 : 0
+                visible: backend.isMacOS && !backend.accessibilityGranted
+                color: root.theme.warningBg
+                border.width: 0
+                clip: true
+
+                RowLayout {
+                    anchors.fill: parent
+                    anchors.leftMargin: 28
+                    anchors.rightMargin: 28
+                    spacing: 14
+
+                    Rectangle {
+                        Layout.preferredWidth: 36
+                        Layout.preferredHeight: 36
+                        radius: 10
+                        color: Qt.rgba(1, 1, 1, root.darkMode ? 0.08 : 0.65)
+
+                        AppIcon {
+                            anchors.centerIn: parent
+                            width: 19
+                            height: 19
+                            name: "warning"
+                            iconColor: root.theme.warning
+                        }
+                    }
+
+                    ColumnLayout {
+                        Layout.fillWidth: true
+                        spacing: 2
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: lm.strings["accessibility.banner_title"] || "Accessibility permission required"
+                            font { family: uiState.fontFamily; pixelSize: 13; bold: true }
+                            color: root.theme.textPrimary
+                            elide: Text.ElideRight
+                        }
+
+                        Text {
+                            Layout.fillWidth: true
+                            text: lm.strings["accessibility.banner_desc"] || "Grant LogiLite permission so mouse buttons and gestures can be captured."
+                            font { family: uiState.fontFamily; pixelSize: 11 }
+                            color: root.theme.textSecondary
+                            elide: Text.ElideRight
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.preferredWidth: openAccessibilityText.implicitWidth + 34
+                        Layout.preferredHeight: 34
+                        radius: 8
+                        color: openAccessibilityMouse.containsMouse ? root.theme.accentHover : root.theme.accent
+
+                        Row {
+                            anchors.centerIn: parent
+                            spacing: 8
+
+                            AppIcon {
+                                width: 15
+                                height: 15
+                                anchors.verticalCenter: parent.verticalCenter
+                                name: "sliders-horizontal"
+                                iconColor: "#ffffff"
+                            }
+
+                            Text {
+                                id: openAccessibilityText
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: lm.strings["accessibility.open_settings"] || "Open Settings"
+                                font { family: uiState.fontFamily; pixelSize: 12; bold: true }
+                                color: "#ffffff"
+                            }
+                        }
+
+                        MouseArea {
+                            id: openAccessibilityMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: backend.openAccessibilitySettings()
+                        }
+                    }
+
+                    Rectangle {
+                        Layout.preferredWidth: 34
+                        Layout.preferredHeight: 34
+                        radius: 8
+                        color: refreshAccessibilityMouse.containsMouse
+                               ? Qt.rgba(1, 1, 1, root.darkMode ? 0.12 : 0.82)
+                               : Qt.rgba(1, 1, 1, root.darkMode ? 0.06 : 0.55)
+                        border.width: 1
+                        border.color: root.theme.border
+
+                        AppIcon {
+                            anchors.centerIn: parent
+                            width: 16
+                            height: 16
+                            name: "refresh-cw"
+                            iconColor: root.theme.textPrimary
+                        }
+
+                        MouseArea {
+                            id: refreshAccessibilityMouse
+                            anchors.fill: parent
+                            hoverEnabled: true
+                            cursorShape: Qt.PointingHandCursor
+                            onClicked: backend.refreshAccessibilityPermission()
+                        }
+
+                        ToolTip.visible: refreshAccessibilityMouse.containsMouse
+                        ToolTip.text: lm.strings["accessibility.refresh_permission"] || "Refresh permission"
+                    }
+                }
             }
-            Loader {
-                active: root.currentPage === 2 || item
-                source: "KeyboardPage.qml"
+
+            StackLayout {
+                id: contentStack
+                Layout.fillWidth: true
+                Layout.fillHeight: true
+                currentIndex: root.currentPage
+
+                MousePage {}
+                Loader {
+                    active: root.currentPage === 1 || item
+                    source: "ScrollPage.qml"
+                }
+                Loader {
+                    active: root.currentPage === 2 || item
+                    source: "KeyboardPage.qml"
+                }
             }
         }
+    }
+
+    Timer {
+        interval: 2000
+        repeat: true
+        running: backend.isMacOS && !backend.accessibilityGranted
+        onTriggered: backend.refreshAccessibilityPermission()
     }
 
     Item {

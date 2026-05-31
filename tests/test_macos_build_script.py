@@ -274,8 +274,9 @@ class MacOSBuildScriptTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, result.stderr)
         codesign = self._codesign_lines()
-        self.assertEqual(len(codesign), 1)
+        self.assertEqual(len(codesign), 2)
         self.assertIn("--force --deep --sign -", codesign[0])
+        self.assertIn("--verify --deep --strict", codesign[1])
 
     def test_identity_signing_order_and_verify_failure(self):
         result = self._run_script(LOGILITE_SIGN_IDENTITY="IDENTITY")

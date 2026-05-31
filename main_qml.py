@@ -955,6 +955,13 @@ def main():
         not force_show
         and (start_hidden or bool(cfg_settings.get("start_minimized", False)))
     )
+    if launch_hidden and sys.platform == "darwin":
+        try:
+            if not is_process_trusted():
+                launch_hidden = False
+                print("[LogiLite] Showing window because Accessibility permission is required")
+        except Exception as exc:
+            print(f"[LogiLite] Accessibility preflight failed: {exc}")
     if hid_backend:
         try:
             set_hid_backend_preference(hid_backend)
@@ -1100,6 +1107,9 @@ def main():
         app.saveStateRequest.connect(
             lambda *_: _allow_macos_session_quit_if_requested(_MACOS_QUIT_FILTER)
         )
+
+    if not launch_hidden:
+        QTimer.singleShot(0, show_main_window)
 
     def _on_second_instance_activate():
         _drain_local_activate_socket(single_server.nextPendingConnection())
